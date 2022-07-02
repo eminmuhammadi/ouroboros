@@ -14,6 +14,7 @@ type SecureEndpoint struct {
 	Endpoint
 	Certificate string
 	Key         string
+	Config      *tls.Config
 }
 
 // Create insecure listener on given endpoint
@@ -33,12 +34,10 @@ func CreateSecureListener(endpoint SecureEndpoint) (net.Listener, error) {
 	}
 
 	// Create TLS config
-	config := &tls.Config{
-		Certificates: []tls.Certificate{cert},
-	}
+	endpoint.Config.Certificates = []tls.Certificate{cert}
 
 	// Create listener
-	listener, err := tls.Listen("tcp", net.JoinHostPort(endpoint.Host, endpoint.Port), config)
+	listener, err := tls.Listen("tcp", net.JoinHostPort(endpoint.Host, endpoint.Port), endpoint.Config)
 
 	return listener, err
 }
